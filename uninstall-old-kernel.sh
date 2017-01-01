@@ -12,8 +12,7 @@ presentkernel1=''
 presentkernel2=''
 
 # sanity check
-if [ $count -gt 0 ]
-then
+if [ $count -gt 0 ]; then
    printf "There are %s older kernels to be uninstalled\n" "$count"
 else
    printf "There are no older kernels! You already only have the latest two kernels installed!\n"
@@ -23,28 +22,23 @@ fi
 count=$((count+2))
 sudo dpkg --list &> /dev/null
 
-while read first kernelver rest
-do
-    if [ $index -gt $count ]
-    then
+while read first kernelver rest; do
+    if [ $index -gt $count ]; then
        break
     fi
 
-    if [ $index -eq $((count-1)) ]
-    then
+    if [ $index -eq $((count-1)) ]; then
 	presentkernel1="$kernelver"
 	index=$((index+1))
 	continue
-    elif [ $index -eq $count ]
-    then
+    elif [ $index -eq $count ]; then
 	presentkernel2="$kernelver"
 	index=$((index+1))
 	continue
     fi
     printf "Uninstalling kernel version: %s ....\n" "$kernelver"
     $(yes | sudo apt-get remove $kernelver &> /dev/null)
-    if [ $? -ne 0 ]
-    then
+    if [ $? -ne 0 ]; then
        printf "Removal of kernel %s failed!\n" "$kernelver"
        exit 1
     fi
