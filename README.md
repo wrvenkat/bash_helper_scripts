@@ -27,21 +27,28 @@
 	  * --esc - Preserve the escape character when reading grouped text. By default doesn't retain the escape character.
 	  * -h | --help - display the help message and quit.
   * **Usage**
-	* asdasdasdas
+	* The file is passed to `strict_read` function specifying the arguments.
+	* If the read is successful, the parsed data can be obtained by calling the `strict_get` function repeatedly. It returns true as long as there is a line. Calling after returning true causes it to start from the first line.
+	* The index of the current line is specifiied by the variable `strict_index`.
+	* An unparsed version of the current line (it should be remembered that the input has already parsed for *lines*) is also present at the variable `strict_unparsed_line`.
+	* The array, `strict_line` holds all the *words* of the *current* line that were separated by fields and grouped by the grouping character.
   * **Example**	
 ``` bash
 	source ../bash_helper_scripts/safe-tilde-expansion.sh
-	strict_read "$@"
+	strict_read --field="\t,\s" --group='"' --line="\n" --comment="#" < afile
 	while strict_get; do
 		printf "Line No: %s:\n" "$strict_index"
 		printf "Unparsed line is: %s\n" "$strict_unparsed_line"
 		for index in "${!strict_line[@]}"; do
-			printf "W%s:%s " "$index" "${strict_line[$index]}"
+			printf "Word:%s:%s " "$index" "${strict_line[$index]}"
 		done
 		printf "\n"
 	done
 ```
+## Versioning ##
+  Stable versions are organized along the lines of Ubuntu's version number. Ex: 16.04 etc.
+  
+## LICENSE ##
 
-asasda 
-#### asdasdasd ####
+[GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html)
 	
