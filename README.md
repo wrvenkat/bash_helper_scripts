@@ -26,8 +26,9 @@
 	  * --comment - commenting character. By default is #.
 	  * --esc - Preserve the escape character when reading grouped text. By default doesn't retain the escape character.
 	  * -h | --help - display the help message and quit.
-  * **Example**
-	    source ../test/safe-tilde-expansion.sh
+  * **Example**  
+	```bash
+	source ../test/safe-tilde-expansion.sh
 	strict_read "$@"
 	while strict_get; do
 		printf "Line No: %s:\n" "$strict_index"
@@ -47,7 +48,7 @@
 			fi
 		done
 		printf "\n"
-	done    
+	done```
   
 #### Conventions and guidelines for creating an install script####
   * An install script that installs software `foo-bar` *should* be named as `foo-bar-install.sh` and a corresponding entry added to the [ibnr-conf](https://github.com/wrvenkat/ibnr-conf) config file.
