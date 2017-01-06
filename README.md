@@ -55,7 +55,7 @@
 	  `./asfe_tilde_expansion \~user/asda/asdasd` outputs, `/home/user/asda/asdasd`
 	  
 ## Versioning ##
-  Stable versions are organized along the lines of Ubuntu's version number. Ex: 16.04 etc.
+  Stable versions are available from the stable branch.
   
 ## LICENSE ##
 
