@@ -39,7 +39,7 @@
 			printf "W%s:%s " "$index" "${strict_line[$index]}"
 		done
 		printf "\n"
-	done```
+	done   
 
 #### Conventions and guidelines for creating an install script####
   * An install script that installs software `foo-bar` *should* be named as `foo-bar-install.sh` and a corresponding entry added to the [ibnr-conf](https://github.com/wrvenkat/ibnr-conf) config file.
