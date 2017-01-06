@@ -6,7 +6,7 @@
   
 ### logger.sh  ###
   A small logging utility that can log error messages and non-error messages. Messages marked for error are prefixed by ERROR: and by default logged to the file error.log and to STDERR. Messages marked as informational are prefixed as INFO: and logged to STDIN. An optional file path can be provided which is used to override the default error.log to log error messages. Messages logged to a file are prefixed with a timestamp.
-  * **Arguments**
+#### Arguments ####
 	  * arg1 - the level. 0 - for informational and 1 - for error.
 	  * arg2 - the message.
 	  * arg3 - optional line no.
@@ -26,26 +26,17 @@
 	  * --comment - commenting character. By default is #.
 	  * --esc - Preserve the escape character when reading grouped text. By default doesn't retain the escape character.
 	  * -h | --help - display the help message and quit.
+  * **Usage**
+	
   * **Example**  
 	```bash
-	source ../test/safe-tilde-expansion.sh
+	source ../bash_helper_scripts/safe-tilde-expansion.sh
 	strict_read "$@"
 	while strict_get; do
 		printf "Line No: %s:\n" "$strict_index"
 		printf "Unparsed line is: %s\n" "$strict_unparsed_line"
 		for index in "${!strict_line[@]}"; do
 			printf "W%s:%s " "$index" "${strict_line[$index]}"
-			if [ "$index" -eq 3 ]; then
-				if remove_group_escape_char "${strict_line[$index]}" 0; then
-					printf "Clean string is %s\n" "$clean_strict_read_str"
-				fi
-				value544="${strict_line[$index]}"
-				if remove_group_escape_char "${strict_line[$index]}"; then
-					value544="$clean_strict_read_str"
-				fi
-				safe_expand_file_path "$value544"
-				:
-			fi
 		done
 		printf "\n"
 	done```
