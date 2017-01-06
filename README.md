@@ -6,7 +6,7 @@
   
 ### logger.sh  ###
   A small logging utility that can log error messages and non-error messages. Messages marked for error are prefixed by ERROR: and by default logged to the file error.log and to STDERR. Messages marked as informational are prefixed as INFO: and logged to STDIN. An optional file path can be provided which is used to override the default error.log to log error messages. Messages logged to a file are prefixed with a timestamp.
-#### Arguments ####
+  * **Arguments**
 	  * arg1 - the level. 0 - for informational and 1 - for error.
 	  * arg2 - the message.
 	  * arg3 - optional line no.
@@ -39,7 +39,7 @@
 			printf "W%s:%s " "$index" "${strict_line[$index]}"
 		done
 		printf "\n"
-	done```  
+	done```
   
 #### Conventions and guidelines for creating an install script####
   * An install script that installs software `foo-bar` *should* be named as `foo-bar-install.sh` and a corresponding entry added to the [ibnr-conf](https://github.com/wrvenkat/ibnr-conf) config file.
