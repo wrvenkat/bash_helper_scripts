@@ -28,7 +28,7 @@
 	  * -h | --help - display the help message and quit.
   * **Usage**
 	
-  * **Example**  
+  * **Example**
 	```bash
 	source ../bash_helper_scripts/safe-tilde-expansion.sh
 	strict_read "$@"
