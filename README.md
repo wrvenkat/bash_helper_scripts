@@ -53,7 +53,10 @@
 	  * arg1 - The string to be considered for a tilde expansion.
   * **Example**  
   	  `./safe_tilde_expansion "rm rf/asda/asdasd"` outputs, `rm rf/asda/asdasd`  
-	  `./asfe_tilde_expansion \~user/asda/asdasd` outputs, `/home/user/asda/asdasd`
+	  `./safe_tilde_expansion \~user/asda/asdasd` outputs, `/home/user/asda/asdasd`  
+	  `./safe_tilde_expansion '~'user/asda/asdasd` outputs, `/home/user/asda/asdasd`  
+	  And when a folder by the name `~$(eval "test\'\'();@%)` exists,
+	  `./safe_tilde_expansion ~\$\(eval\ \"test\\\'\\`\(\)\;@%\)/` outputs, `~$(eval "test\'\'();@%)`  
 	  
 ## Versioning ##
   Stable versions are available from the stable branch.
