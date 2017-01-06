@@ -28,7 +28,7 @@
 	  * -h | --help - display the help message and quit.
   * **Usage**
 	* asdasdasdas
-  * **Example**
+  * **Example**  
 	```bash
 	source ../bash_helper_scripts/safe-tilde-expansion.sh
 	strict_read "$@"
@@ -39,5 +39,5 @@
 			printf "W%s:%s " "$index" "${strict_line[$index]}"
 		done
 		printf "\n"
-	done```
+	done```  
 	
