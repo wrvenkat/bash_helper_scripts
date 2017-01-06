@@ -50,7 +50,7 @@
   This utility tries to perform a *safe*, possilbe tilde expansion of the given string, considering it as a file path and outputs the result. The result is the same as the input if there was no expansion performed. Otherwise, a tilde expanded string is output.
   * **Arguments**
 	  * arg1 - The string to be considered for a tilde expansion.
-  * **Example**__
+  * **Example**
 	  `./safe_tilde_expansion "rm rf/asda/asdasd"` outputs, `rm rf/asda/asdasd`  
 	  `./asfe_tilde_expansion \~user/asda/asdasd` outputs, `/home/user/asda/asdasd`
 	  
