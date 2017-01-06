@@ -29,7 +29,7 @@
   * **Usage**
 	
   * **Example**
-	```bash
+	```bash  
 	source ../bash_helper_scripts/safe-tilde-expansion.sh
 	strict_read "$@"
 	while strict_get; do
@@ -41,6 +41,7 @@
 		printf "\n"
 	done```
   
+    
 #### Conventions and guidelines for creating an install script####
   * An install script that installs software `foo-bar` *should* be named as `foo-bar-install.sh` and a corresponding entry added to the [ibnr-conf](https://github.com/wrvenkat/ibnr-conf) config file.
   * An install script *should* always exit with a value - 0 for no error and 1 for failure. This exit value is used by the install script to determine if the installation was successfuly or not.
