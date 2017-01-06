@@ -39,8 +39,7 @@
 			printf "W%s:%s " "$index" "${strict_line[$index]}"
 		done
 		printf "\n"
-	done
-	```
+	done```
 
 #### asdasdasd ####
 	
