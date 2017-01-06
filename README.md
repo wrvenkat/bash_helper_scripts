@@ -13,7 +13,7 @@
 	  
 ### strict_read.sh ###
   This utility script provides bash's `read` type functionality. This utlity reads a file and splits it into *lines*, ignoring *comments*. Within a line, the utlity combines text based on *fields* and *groups*. Each of the distinguishing types are individually configurable as follows,
-  * **lines** - by default, the line splitting character is new line charcters - CR and LF.
+  * **lines** - by default, the line splitting character is new line characters - CR and LF.
   * **comments** - by default, the commenting character is #. Part of the line that begins with this character is ignored unless the character is *grouped*.
   * **group** - a group is the text within an opening and closing *grouping* character. By default, this *grouping* character is a single quote. Any text except the grouping char is grouped together and is taken literally. The grouping character must be escaped by a backslash if specified within enclosing *grouping* characters.
   * **field** - text can also be separated by any of field comma separated characters. By default, these are tab `\t` and space ( ). If a comma needs to be part of the field separation character set, it needs to be backslash escaped.
