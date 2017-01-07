@@ -1,0 +1,12 @@
+test1	"test.conf"	0:0	"/media/Academics/Current/My Scripts/SystemConfigure/dir1/$(eval \"test\'`();@%)"
+test	"test.conf"	0:0	~adsasdasdas"Test"
+test	"test.conf"	0:0	~adsa"s   d as d \"as \"Test \/ adsasdasd /\"!@#$%^*()_&^%$&*()_+_$%#@"
+test	"test.conf"	0:0	~ads" asdasdas asdasd !@#$$&@#R@^#$^$%&)*() \"Test~asdasd asdasdads \""aftertquotesstringasda
+test1	"test.conf"	0:0	"/media/Academics/Current/My Scripts/SystemConfigure/dir1/$(eval \"test\'`();@%)"
+test1	"test.conf"	0:0	~venkat/"this is a test"
+test2	"asdas.com"	0:0	~"venkat"/"this is also a test"
+test3	"asdasd"	0:0	"~asdasdasdasd"
+tewst	"asdas"		0:0	~asdasdas
+asda	"asda"		0:0	"\"~venkat\""
+asd	"asdasd"	0:0	"\"~\""venkat
+adsa	aszdasda	0:0	~venkat"/$(eval \"test\'`();@%)/"
