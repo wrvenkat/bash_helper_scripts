@@ -18,6 +18,10 @@ display_strict_read_help_message(){
     printf "Description:\n------------\n\t1. Reads input from a stream and breaks it up into lines based on a line de-limiting character. If unspecified, the default character is a newline. \n\t2. Groups the line read into words based on a grouping character. All characters specified between matching grouping character are taken literally. The grouping character can be escaped within this bounds using '\\\'. The escape character '\\\' can itself be escaped by having it prefixed by another '\\\'. If unspecified, the default value is ' (a single quote).\n\t3. Separates the grouped strings into words based on field separtation character(s). By default, the field separators are the whitespace characters, except for the newline characters. More than one character can be specified by separating the characters by ','. ',' and '\\\' can be escaped by prefixing them with '\\\'.\n\t4. 2. and 3. occur at the same time, L->R, based on which character(s) from 2. or 3. comes first.\n\t5. This functionality happens in two phases. First, the input is read and some initial parsing is done and the input stored in an array by the strict_read function. Then, when the strict_read is called, the parsed array is output per line and the result stored in the strict_line array, where each element in the array is a word.\n\t6. To use this functionality, the strict_read.sh file has to be sourced in and then the functions strict_read and strict_get called.\n\nUsage:\n------\n\tsource strict_read.sh\n\tstrict_read arguments < <input-stream>\n\tstrict_get\n\nGlobal Variables\n----------------\n\tstrict_index\t\t- Holds the line number of the current line in the source stream.\n\tstrict_line\t\t- An array. Each element in this array corresponds to a word in a line.\n\tstrict_unparsed_line\t- Holds the current unparsed line.\n\nExample Usage\n-----------\n\tsource strict_read.sh\n\tstrict_read --field='\\\\t,\\s,\\,' --line='\"' --group=\":\" < input\n\twhile strict_get; do\n\t\tprintf \"Line No: %%s\\\\n\" \"\$strict_index\"\n\t\tprintf \"Unparsed line is: %%s\\\\n\" \"\$strict_unparsed_line\"\n\t\tfor index2 in \"\${!strict_line[@]}\"; do\n\t\t\tprintf \"W%%s:%%s \" \"\$index2\" \"\${strict_line[$index2]}\"\n\t\tdone\n\t\tprintf \"\\\\n\"\n\tdone\n\nArguments\n---------\n\t-h\t\t\t\t\t- Display this message and quit.\n\t--comment=<comment-char>\t\t- Optional option. The character that when provided is used as a commenting character. Any text that appears after this character is ignored until the end-of-line. If it appears inside a group, it is taken literally.\n\t--group=<grouping_character>\t\t- The character to be used for grouping. If specified, requires an argument. Default value is \".\n\t--line=<line_separation_character>\t- The line separation character. If specified, requires an argument. Default value is \\\\n.\n\t--field=<field_separation_characters>\t- The comma separated characters that is used to spearate input into words. ',' can be escaped using '\\' and '\\\' can be escaped using '\\\'. If specifed, requires a character or a list of characters. Default value is set to \\\\t.\n\n\tThe strict_read populates the strict_array array with each line, starting form the first line. Since, strict_read preserves read input for the program running time, calling strict_get repeatedly wraps around the last line to the first. The line currently available can be obtained from strict_line array. The total number of lines present in the input is the largest number that is presented by strict_line_count after all the input has been parsed into lines. Calling strict_get before any input has been read results in an empty strict_line array.\n\nLimitations\n-----------\n\tSince this file has to be sourced in to be made use of, the strict_read call cannot be nested with other strict_read calls or any other functions that use strict_read call. The functionality cannot be deferred to a sub-shell since it relies on global variables to provide the result of parsing.\n"
 }
 
+print_no_slash_message(){
+    printf "A '\\\\' can't be part of any of the special characters except when used as an escape character.\n"
+}
+
 clean_strict_read_str=
 #removes the escape chars from the provided input and saves it in clean_strict_read_str
 #takes two arguments,
@@ -81,6 +85,7 @@ get_ascii_char(){
 	return 1
     fi
 
+    #printf "Received escape value is %s\n" "$1"
     actual_ascii_value12char=
     if [ "$1" == "\n" ]; then
 	actual_ascii_value12char=$'\n'
@@ -165,6 +170,10 @@ parse_EOL_char (){
     done < <(printf "%s" "$1")
     IFS="$orig_IFS"
 
+    if [ "$line_char" == '\' ]; then
+	print_no_slash_message
+	return 1
+    fi    
     return 0
 }
 
@@ -219,6 +228,11 @@ parse_grouping_char (){
 	fi
     done < <(printf "%s" "$1")
     IFS="$orig_IFS"
+
+    if [ "$group_char" == '\' ]; then
+	print_no_slash_message
+	return 1
+    fi
     return 0
 }
 
@@ -248,45 +262,138 @@ get_field_char_array(){
     if [ -z "$1" ]; then
 	return 0;
     fi
-    
+
+    local error_msg="Incorrect format for specifiying field characters. A ',' that is a field character must be escaped by a backslash and/or all field characters specified must be comma separated."
     local char=
     local escaped_char=
-    local saw_slash=0
+    local escape_slash=0
+    local saw_comma=0
+    local recorded_char_count=0
+    local recorded_char=
     local index=0
     local orig_IFS="$IFS"
     IFS=
     while read -r -N 1 char; do
 	#printf "char is %s\n" "$char"
-	# any char prefixed by \ is taken literally
-	if [ "$saw_slash" -eq 1 ]; then
-	    if [ "$char" == ',' ]; then
-		char=","
-	    else		
-		escaped_char="$escaped_char""$char"
-		if get_ascii_char "$escaped_char"; then
-		    char="$actual_ascii_value12char"
-		else
-		    char="$escaped_char"
+
+	#Handle backslash states - 1 of 1
+	if [ "$char" == '\' ]; then
+	    if [ "$escape_slash" -eq 0 ]; then
+		escape_slash=1
+		recorded_char="$recorded_char""$char"
+		continue
+	    elif [ "$escape_slash" -eq 1 ]; then
+		escape_slash=0
+		recorded_char="$recorded_char""$char"
+		if get_ascii_char "$recorded_char"; then
+		    recorded_char="$actual_ascii_value12char"
 		fi
-	    fi
-	    field_char_array[$index]="$char"
-	    ((index+=1))
-	    saw_slash=0
-	    escaped_char=
-	else
-	    if [ "$char" == '\' ]; then
-		saw_slash=1
-		escaped_char="\\"
-	    elif [ "$char" == ',' ]; then
-		continue;
-	    else
-		field_char_array[$index]="$char"
+		#printf "ASCII char is %s--\n" "$recorded_char"
+		field_char_array[$index]="$recorded_char"
 		((index+=1))
+		recorded_char_count=1
+		recorded_char=
+		saw_comma=0
+		continue
 	    fi
 	fi
+
+	#Handle comma states
+	if [ "$char" == ',' ]; then
+	    #Handle comma state - 1 of 2
+	    if [ "$escape_slash" -eq 1 ]; then
+		escape_slash=0
+		recorded_char="$recorded_char""$char"
+		if get_ascii_char "$recorded_char"; then
+		    recorded_char="$actual_ascii_value12char"
+		fi
+		field_char_array[$index]="$recorded_char"
+		((index+=1))
+		recorded_char_count=1
+		recorded_char=
+		continue
+	    elif [ "$escape_slash" -eq 0 ]; then
+		#Handle comma state - 2 of 2
+		if [ "$recorded_char_count" -gt 0 ]; then
+		    saw_comma=1
+		    continue
+		elif [ "$recorded_char_count" -le 0 ]; then
+		    printf "%s\n" "$error_msg"
+		    return 1
+		fi
+	    fi
+	fi
+
+	#anyother character
+	#Handle general state - 1 of 3
+	if [ "$saw_comma" -eq 0 ] && [ "$recorded_char_count" -le 0 ]; then	    
+	    if [ "$escape_slash" -eq 1 ]; then
+		escape_slash=0
+		recorded_char="$recorded_char""$char"
+		if get_ascii_char "$recorded_char"; then
+		    recorded_char="$actual_ascii_value12char"
+		fi
+		#printf "ASCII char is %s--\n" "$recorded_char"
+		field_char_array[$index]="$recorded_char"
+		((index+=1))
+		recorded_char_count=1
+		recorded_char=
+		continue
+	    else
+		recorded_char="$char"
+		field_char_array[$index]="$recorded_char"
+		((index+=1))
+		recorded_char_count=1
+		recorded_char=
+		continue
+	    fi
+	#Handle general state - 2 of 3 (seen a character but the next is not comma separated)
+	elif [ "$saw_comma" -eq 0 ] && [ "$recorded_char_count" -ge 1 ]; then
+	    printf "%s\n" "$error_msg"
+	    return 1
+	#Handle general state - 3 of 3
+	elif [ "$saw_comma" -eq 1 ]; then
+	    saw_comma=0
+	    if [ "$escape_slash" -eq 1 ]; then
+		escape_slash=0
+		recorded_char="$recorded_char""$char"
+		if get_ascii_char "$recorded_char"; then
+		    recorded_char="$actual_ascii_value12char"
+		fi
+		#printf "ASCII char is %s--\n" "$recorded_char"
+		field_char_array[$index]="$recorded_char"
+		((index+=1))
+		recorded_char_count=1
+		recorded_char=
+		continue
+	    else
+		recorded_char="$char"
+		field_char_array[$index]="$recorded_char"
+		((index+=1))
+		recorded_char_count=1
+		recorded_char=
+		continue
+	    fi
+	fi	
     done < <(printf "%s" "$1")
+    #if there seems to be more to be read, but none specified
+    if [ "$saw_comma" -eq 1 ]; then
+	printf "%s\n" "$error_msg"
+	return 1
+    fi
     IFS="$orig_IFS"
 
+    index=0
+    char=
+    while [ $index -lt ${#field_char_array[*]} ]; do	
+	char="${field_char_array[$index]}"
+	#printf "char is %s\n" "$char"
+	if [ "$char" == '\' ]; then
+	    print_no_slash_message
+	    return 1
+	fi
+	((index+=1))
+    done
     return 0
 }
 
@@ -295,7 +402,7 @@ get_field_char_array(){
 print_field_char_array(){
     local index=0
     local char=
-    while [ $index -lt ${#field_char_array[*]} ]; do
+    while [ $index -lt ${#field_char_array[*]} ]; do	
 	char="${field_char_array[$index]}"
 	if [ "$char" == ',' ]; then
 	    printf '\'
@@ -321,10 +428,23 @@ parse_comment_char (){
     IFS=
     while read -r -N 1 char; do
 	if [ "$index" -gt 1 ]; then
+	    printf "Please provide only one value for comment character.\n"
 	    return 1
 	fi
+	((index+=1))
     done < <(printf "%s" "$1")
     IFS="$orig_IFS"
+
+    orig_IFS="$IFS"
+    IFS=
+    while read -r -N 1 char; do
+    if [ "$char" == '\' ]; then
+	print_no_slash_message
+	return 1
+    fi
+    done < <(printf "%s" "$1")
+    IFS="$orig_IFS"
+    
     return 0
 }
 
@@ -513,12 +633,11 @@ strict_read(){
 	fi
 	# get the unescaped version of this character for grouping
 	if ! parse_EOL_char "$line_char"; then
-	    line_char=$'\n'
-	    parse_EOL_char "$line_char"
-	fi
-	#printf "End of line char is %s\n" "$line_char"
+	    exit 1
+	fi	
     fi
-
+    #printf "End of line char is %s\n" "$line_char"
+    
     #GROUP
     if [ -z "$group_char" ]; then
 	group_char="'"
@@ -528,7 +647,7 @@ strict_read(){
 	fi
 	# get the unescaped version of this character for grouping
 	if ! parse_grouping_char "$group_char"; then
-	    group_char="'"
+	    exit 1
 	fi
     fi
     #printf "Grouping char is %s\n" "$group_char"
@@ -542,7 +661,9 @@ strict_read(){
 	field_chars="$no_singlequotes_value12"
     fi
     
-    get_field_char_array "$field_chars"
+    if ! get_field_char_array "$field_chars"; then
+	exit 1
+    fi
     #printf "Field separator characters are,\n"
     #print_field_char_array
 
@@ -551,12 +672,11 @@ strict_read(){
 	if remove_single_quotes "$comment_char"; then
 	    comment_char="$no_singlequotes_value12"
 	    if ! parse_comment_char "$comment_char"; then
-		comment_char=
-	    #else	
-		#printf "Comment char is %s\n" "$comment_char"
+		exit 1
 	    fi
 	fi
     fi
+    #printf "Comment char is %s\n" "$comment_char"
 
     #check for any overlap between the provided characters
     if ! check_overlap; then
@@ -576,62 +696,106 @@ strict_read(){
     IFS=
     #read raw, non-delimited input one character at a time
     while read -r -N 1 char; do
-	#we record a line when it is not a comment and when any EOL char is not part of a group
-	#printf "Char is %s\n" "$char"
-	#TAKE CARE OF COMMENT CHARS
-	#if we have already encountered a comment char, then we do not record anything and keep skipping until we encounter an EOL char. 
-	if [ "$entered_comment" -eq 1 ]; then
-	    if is_EOL_char "$char"; then
-		entered_comment=0
-		line=
-	    fi
-	    continue
+	#printf "Char is:%s " "$char"
+	#printf "Line is:%s" "$line"
+	
+	#Handle comment state - 1 of 2
+	if [ "$entered_comment" -eq 1 ] && ! is_EOL_char "$char"; then
+	    continue;
 	fi
-	#if a char is a comment char and is not part of a group, we consider the the entire line as
-	#a comment
-	if [ "$entered_group" -eq 0 ] && is_comment_char "$char"; then
-	    entered_comment=1
-	    continue
+	#Handle comment state - 2 of 2
+	if is_comment_char "$char"; then
+	    escape_slash=0
+	    if [ "$entered_group" -eq 1 ]; then
+		line="$line""$char"
+		continue;
+	    elif [ "$entered_group" -eq 0 ]; then
+		entered_comment=1;
+		continue;
+	    fi
 	fi
 
-	#TAKE CARE OF GROUPING
+	#Handle escape backslash
+	if [ "$char" == "\\" ]; then
+	    if [ "$escape_slash" -eq 1 ]; then
+		#we set 1 for escape_slash because it might be to escape the next char
+		escape_slash=1
+		line="$line""$char"
+		continue
+	    elif [ "$escape_slash" -eq 0 ]; then
+		escape_slash=1
+		line="$line""$char"
+		continue
+	    fi	    
+	fi
+
+	#Handle grouping states
 	if is_grouping_char "$char"; then
-	    if [ "$entered_group" -eq 0 ]; then
-		if [ "$escape_slash" -eq 0 ]; then
-		    entered_group=1
-		else
-		    escape_slash=0
-		fi
-	    else
-		if [ "$escape_slash" -eq 0 ]; then
+	    #Handle grouping state - 1 of 2
+	    if [ "$escape_slash" -eq 1 ]; then
+		escape_slash=0
+		line="$line""$char"
+		continue;
+	    elif [ "$escape_slash" -eq 0 ]; then
+		#Handle grouping state - 2 of 2
+		if [ "$entered_group" -eq 1 ]; then
 		    entered_group=0
-		else
-		    escape_slash=0
-		fi
+		    line="$line""$char"
+		    continue;
+		elif [ "$entered_group" -eq 0 ]; then
+		    entered_group=1
+		    line="$line""$char"
+		    continue;
+		fi		
 	    fi
 	fi
 
-	#record a line
-	#if it is a new line not within a group, then we mark it as the termination of a line
-	if is_EOL_char "$char" && [ "$entered_group" -eq 0 ]; then
-	    #printf "Line is %s\n" "$line"
-	    if [ -n "$line" ]; then
-		strict_array[$index]="$line"
+	#Handle EOL states
+	if is_EOL_char "$char"; then
+	    escape_slash=0
+	    #Handle EOL state - 1 of 2
+	    if [ "$entered_comment" -eq 0 ]; then
+		#Handle EOL states - 2 of 2
+		if [ "$entered_group" -eq 1 ]; then
+		    line="$line""$char"
+		    continue;
+		elif [ "$entered_group" -eq 0 ]; then
+		    #record a line
+		    printf "Line is %s\n" "$line"
+		    if [ -n "$line" ]; then
+			strict_array[$index]="$line"
+			char=
+			line=
+			((index+=1))
+			continue;
+		    fi
+		fi
+	    elif [ "$entered_comment" -eq 1 ]; then
 		char=
 		line=
-		((index+=1))
+		entered_comment=0
+		continue;
 	    fi
-	else
-	    line="$line""$char"
 	fi
+
+	#if it is anyother character
+	escape_slash=0
+	line="$line""$char"
     done
-    #we add whatever we received if there was 
-    #no EOL character we came across
-    if [ -n "$line" ]; then
-	strict_array[$index]="$line"
-	char=
-	line=
-	((index+=1))
+    #we add whatever we received if the grouping is complete and we've reached the end of input
+    if [ "$entered_group" -eq 0 ]; then
+	if [ -n "$line" ]; then
+	    printf "Line is %s\n" "$line"
+	    strict_array[$index]="$line"
+	    char=
+	    line=
+	    ((index+=1))
+	fi
+    else
+	printf "PARSE ERROR: Group not closed for line:\n%s\n" "$line"
+	#we restore the IFS
+	IFS="$orig_IFS"
+	return 1
     fi
     #we restore the IFS
     IFS="$orig_IFS"
