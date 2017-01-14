@@ -5,8 +5,8 @@
   This section describes each individual script.
   
 ### singlequotes_wrap_unwrap.sh ###
-  This utility script wraps and unwraps a given text in singlequotes so that it can be used in CLI escaping Bash's expansion of the enclosed text.
-  Example, lets say the text `\'\"hello world\"` needs to be passed to another command without bash expanding on it. It would be done as,
+  * This utility script wraps and unwraps a given text in singlequotes so that it can be used in CLI escaping Bash's expansion of the enclosed text.
+  * Example, lets say the text `\'\"hello world\"` needs to be passed to another command without bash expanding on it. It would be done as,  
 ``` bash  
 	var=\'\"hello world\"
 	if source singlequotes_wrap_unwrap.sh; then
@@ -23,9 +23,8 @@
 		fi
 	fi
 ```
-  This utility needs to be sourced in.
-  The wrapped or unwrapped text is available in the `output_String` variable.
-  The function to call is `wrap_unwrap_singlequotes` which takes two arguments,
+  * This utility needs to be sourced in. The wrapped or unwrapped text is available in the `output_String` variable.
+  * The function to call is `wrap_unwrap_singlequotes` which takes two arguments,
 	* Arg1 - 0 or 1, 0 to unwrap and 1 to wrap.
 	* Arg2 - the text to be wrapped or unwrapped.
 
