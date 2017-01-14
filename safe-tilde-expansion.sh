@@ -11,7 +11,7 @@ safe_expand_file_path(){
 	return 0
     fi
 
-    #printf "Received value is %s\n" "$1"
+    printf "Received value is %s\n" "$1"
     local expanded_path=
     local quotes=0
     local char=
@@ -70,8 +70,8 @@ safe_expand_file_path(){
 
     if [ "$expand_safely" -eq 0 ]; then
 	safe_file_path="$1"
-	#printf "The file path is %s\n" "$safe_file_path"
-	return 0
+	printf "%s" "$safe_file_path"
+	return 1
     fi
 
     #we string/file encode the path of file to be expanded
@@ -113,6 +113,10 @@ safe_expand_file_path(){
     #Perform eval
     if eval expanded_path=$word; then
 	safe_file_path="$expanded_path""$rest_word"
-	#printf "Expanded Path is %s\n" "$safe_file_path"
+	printf "%s" "$safe_file_path"
     fi
+
+    return 0
 }
+
+safe_expand_file_path "$@"

@@ -841,6 +841,7 @@ strict_get(){
     IFS=
     #read raw input one character at a time
     while read -r -N 1 char; do
+	#FIX MEEEEE :(
 	#printf "Char is %s\n" "$char"
 	if is_grouping_char "$char"; then
 	    if [ "$entered_group" -eq 0 ]; then
@@ -886,20 +887,22 @@ strict_get(){
 		if [ "$entered_group" -eq 1 ]; then
 		    if [ "$escape_slash" -eq 1 ]; then
 			if [ "$PRESERVE_ESCAPE_CHAR" -eq 1 ]; then
-			    word="$word""\\"
+			    word="$word"'\\'
 			fi
 			escape_slash=0
-			word="$word""\\"
+			word="$word"'\'
 		    else
 			escape_slash=1
 		    fi
 		else
-		    word="$word""\\"
+		    word="$word"'\'
 		    escape_slash=1
 		fi
 	    else
 		if [ "$escape_slash" -eq 1 ]; then
-		    word="$word""\\"
+		    if [ "$PRESERVE_ESCAPE_CHAR" -eq 1 ]; then
+			word="$word"'\'
+		    fi
 		    escape_slash=0
 		fi
 		word="$word""$char"
