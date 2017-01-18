@@ -16,6 +16,8 @@ main(){
 		    printf "Value before expansion: %s\n" "$value544"
 		    if abs_path=$(./../safe-tilde-expansion.sh "$value544"); then
 			printf "Expanded path is %s\n" "$abs_path"
+		    else
+			printf "Expansion failed. Error is:%s\n" "$abs_path"
 		    fi
 		fi
 	    done

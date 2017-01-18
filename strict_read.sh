@@ -761,7 +761,7 @@ strict_read(){
 		    continue;
 		elif [ "$entered_group" -eq 0 ]; then
 		    #record a line
-		    printf "Line is %s\n" "$line"
+		    #printf "Line is %s\n" "$line"
 		    if [ -n "$line" ]; then
 			strict_array[$index]="$line"
 			char=
@@ -841,72 +841,106 @@ strict_get(){
     IFS=
     #read raw input one character at a time
     while read -r -N 1 char; do
-	#FIX MEEEEE :(
 	#printf "Char is %s\n" "$char"
-	if is_grouping_char "$char"; then
-	    if [ "$entered_group" -eq 0 ]; then
-		if [ "$escape_slash" -eq 0 ]; then
-		    entered_group=1
-		else
+	#handle states when inside a group
+	if [ "$entered_group" -eq 1 ]; then
+	    if is_grouping_char "$char"; then
+		if [ "$escape_slash" -eq 1 ]; then
 		    if [ "$PRESERVE_ESCAPE_CHAR" -eq 1 ]; then
-			word="$word""\\"
+			word="$word"'\'
 		    fi
-		    word="$word""$group_char"
+		    word="$word""$char"
 		    escape_slash=0
+		    continue
+		elif [ "$escape_slash" -eq 0 ]; then
+		    if [ "$PRESERVE_ESCAPE_CHAR" -eq 1 ]; then
+			word="$word""$char"
+		    fi
+		    if [ -n "$word" ]; then
+			strict_line["$word_index"]="$word"
+			word=
+			#printf "Word is %s\n" "${strict_line[$word_index]}"
+			((word_index+=1))
+		    fi
+		    entered_group=0
+		    continue
 		fi
 	    else
-		if [ "$escape_slash" -eq 0 ]; then
-		    entered_group=0
-		    #if [ -n "$word" ]; then
-			#strict_line["$word_index"]="$word"
-			#word=
-			#((word_index+=1))
-		    #fi
-		    :
-		else
-		    if [ "$PRESERVE_ESCAPE_CHAR" -eq 1 ]; then
-			word="$word""\\"
+		if [ "$escape_slash" -eq 1 ]; then
+		    if [ "$char" == '\' ] ||\
+			   [ "$PRESERVE_ESCAPE_CHAR" -eq 1 ]; then
+			word="$word"'\'
 		    fi
-		    word="$word""$group_char"
 		    escape_slash=0
-		fi		    
+		    word="$word""$char"
+		    continue
+		else
+		    if [ "$char" == '\' ]; then
+			escape_slash=1
+			continue
+		    fi
+		    word="$word""$char"
+		    continue
+		fi
 	    fi
-	#if we're not in a group and the char encountered is a comment,
-	# we break and stop reading further
-	elif [ "$entered_group" -eq 0 ] && is_comment_char "$char"; then
-	    break;
-	elif [ "$entered_group" -eq 0 ] && is_field_char "$char"; then
+	fi
+
+	#if we're outside a group, see what state we need to be in or just continue parsing
+	#if the char is a field char
+	if is_field_char "$char"; then
 	    if [ -n "$word" ]; then
 		strict_line["$word_index"]="$word"
 		word=
 		#printf "Word is %s\n" "${strict_line[$word_index]}"
 		((word_index+=1))
 	    fi
-	else
-	    if [ "$char" == "\\" ]; then
-		if [ "$entered_group" -eq 1 ]; then
-		    if [ "$escape_slash" -eq 1 ]; then
-			if [ "$PRESERVE_ESCAPE_CHAR" -eq 1 ]; then
-			    word="$word"'\\'
-			fi
-			escape_slash=0
-			word="$word"'\'
-		    else
-			escape_slash=1
-		    fi
-		else
-		    word="$word"'\'
-		    escape_slash=1
-		fi
-	    else
-		if [ "$escape_slash" -eq 1 ]; then
-		    if [ "$PRESERVE_ESCAPE_CHAR" -eq 1 ]; then
-			word="$word"'\'
-		    fi
-		    escape_slash=0
+	    continue
+	fi
+
+	#if the char is a grouping char
+	if is_grouping_char "$char"; then
+	    if [ "$escape_slash" -eq 1 ]; then
+		if [ "$PRESERVE_ESCAPE_CHAR" -eq 1 ]; then
+		    word="$word"'\'			
 		fi
 		word="$word""$char"
+		escape_slash=0
+		continue
+	    else
+		if [ "$PRESERVE_ESCAPE_CHAR" -eq 1 ]; then
+		    word="$word"'"'
+		fi
+		entered_group=1
+		continue
 	    fi
+	fi
+
+	#when char is \
+	if [ "$char" == '\' ]; then
+	    if [ "$escape_slash" -eq 1 ]; then
+		if [ "$PRESERVE_ESCAPE_CHAR" -eq 1 ]; then
+		    word="$word"'\'			
+		fi
+		word="$word""$char"
+		escape_slash=0
+		continue
+	    else
+		escape_slash=1
+		continue
+	    fi
+	fi
+
+	#when it is just another char
+	if [ "$escape_slash" -eq 1 ]; then
+	    if [ "$PRESERVE_ESCAPE_CHAR" -eq 1 ]; then
+		word="$word"'\'			
+	    fi
+	    word="$word""$char"
+	    escape_slash=0
+	    continue
+	else
+	    word="$word""$char"
+	    continue
 	fi
     done < <(printf "%s" "$line")
 
