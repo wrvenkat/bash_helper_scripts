@@ -3,30 +3,6 @@
   
 ## Getting started ##
   This section describes each individual script.
-  
-### singlequotes_wrap_unwrap.sh ###
-  * This utility script wraps and unwraps a given text in singlequotes so that it can be used in CLI escaping Bash's expansion of the enclosed text.
-  * Example, lets say the text `\'\"hello world\"` needs to be passed to another command without bash expanding on it. It would be done as,  
-``` bash  
-	var=\'\"hello world\"
-	if source singlequotes_wrap_unwrap.sh; then
-		#wrap in singlequotes
-		if wrap_unwrap_singlequotes 1 "$str"; then
-			printf "Wrapped text is:%s\n" "$output_string"
-			cmd_tool "$output_string"
-		fi
-		
-		#unwrap singlequoted text
-		str="$2"
-		if wrap_unwrap_singlequotes 0 "$str"; then
-			printf "Unwrapped text is:%s\n" "$output_string"
-		fi
-	fi
-```
-  * This utility needs to be sourced in. The wrapped or unwrapped text is available in the `output_String` variable.
-  * The function to call is `wrap_unwrap_singlequotes` which takes two arguments,
-	* Arg1 - 0 or 1, 0 to unwrap and 1 to wrap.
-	* Arg2 - the text to be wrapped or unwrapped.
 
 ### logger.sh  ###
   A small logging utility that can log error messages and non-error messages. Messages marked for error are prefixed by ERROR: and by default logged to the file error.log and to STDERR. Messages marked as informational are prefixed as INFO: and logged to STDIN. An optional file path can be provided which is used to override the default error.log to log error messages. Messages logged to a file are prefixed with a timestamp.
