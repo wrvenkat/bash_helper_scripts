@@ -2,6 +2,7 @@
 
 #This function safely expands the provided path
 #accepts the string to be intyerpreted as a file path and perform an expansion on
+#and an optional argument to display the tilde prefix as well if there was a successful expansion
 #prints empty if for some reason expansion fails
 #the final path is saved in the variable safe_file_path
 
@@ -11,7 +12,8 @@ safe_expand_file_path(){
 	return 0
     fi
 
-    printf "Received value is %s\n" "$1"
+    #printf "Received value is %s\n" "$1"
+    local display_tilde_prefix=0
     local safe_file_path=
     local expanded_path=
     local char=
@@ -25,11 +27,18 @@ safe_expand_file_path(){
     local tilde_spotted=0
     local word_index=0
 
+    if [ -z "$2" ] || [ "$2" -eq 0 ]; then
+	display_tilde_prefix=0
+    elif [ "$2" -eq 1 ]; then
+	display_tilde_prefix=1
+    fi
+
     #this is done to prevent read ignoring leading and trailing IFS characters
     local orig_IFS="$IFS"
     IFS=
     #perform a quoting parse while trying to identify the tilde prefix if present
     while read -r -N 1 char; do
+	printf "Char is %s\n" "$char"
 	((word_index+=1))
 	#handle s_quote states
 	if [ "$s_quote" -eq 1 ]; then
@@ -61,7 +70,7 @@ safe_expand_file_path(){
 		elif [ "$backslash" -eq 1 ]; then
 		    #d_quote state 4 of 5
 		    if [ "$char" == '\' ]; then
-			output_string="$output_string"\\
+			output_string="$output_string"'\'
 			backslash=0
 			continue
 		    elif [ "$char" == '"' ]; then
@@ -189,13 +198,16 @@ safe_expand_file_path(){
     if [ -z "$tilde_prefix" ]; then
 	exit 1
     fi
-    printf "Tilde Prefix for expansion is %s\n" "$tilde_prefix"
+    #printf "Tilde Prefix for expansion is %s\n" "$tilde_prefix"
     #Perform eval
     if eval expanded_path=$tilde_prefix; then
+	if [ "$display_tilde_prefix" -eq 1 ]; then
+	    printf "%s\n" "$tilde_prefix"
+	    printf "%s\n" "$expanded_path"
+	fi
 	safe_file_path="$expanded_path""$output_string"
-	printf "%s" "$safe_file_path"
+	printf "%s\n" "$safe_file_path"
     fi
-
     return 0
 }
 

@@ -144,23 +144,23 @@ bash_quoting_parse(){
     #and as the last character
     if [ "$backslash" -eq 1 ]; then
 	printf "ERROR: Expecting new line after \\:%s\n" "$output_string"
-	exit 1
+	return 1
     fi    
     if [ "$s_quote" -eq 1 ]; then
-	printf "ERROR: Expecing ':%s\n" "$output_string"
-	exit 1
+	printf "ERROR: Expecting ':%s\n" "$output_string"
+	return 1
     fi
     if [ "$d_quote" -eq 1 ]; then
-	printf "ERROR: Expecing \":%s\n" "$output_string"
-	exit 1
+	printf "ERROR: Expecting \":%s\n" "$output_string"
+	return 1
     fi    
     quoting_parsed_string="$output_string"
     return 0
 }
 
-if bash_quoting_parse "$@"; then    
-    printf "Output string is:%s\n" "$quoting_parsed_string"
-    exit 0
-else
-    exit $?
-fi
+#if bash_quoting_parse "$@"; then    
+#    #printf "Output string is:%s\n" "$quoting_parsed_string"
+#    exit 0
+#else
+#    exit $?
+#fi
