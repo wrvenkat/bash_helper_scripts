@@ -697,7 +697,7 @@ strict_read(){
     #read raw, non-delimited input one character at a time
     while read -r -N 1 char; do
 	#printf "Char is:%s " "$char"
-	#printf "Line is:%s" "$line"
+	#printf "Line is:%s\n" "$line"
 	
 	#Handle comment state - 1 of 2
 	if [ "$entered_comment" -eq 1 ] && ! is_EOL_char "$char"; then
@@ -716,7 +716,7 @@ strict_read(){
 	fi
 
 	#Handle escape backslash
-	if [ "$char" == "\\" ]; then
+	if [ "$char" == '\' ]; then
 	    if [ "$escape_slash" -eq 1 ]; then
 		#we set 1 for escape_slash because it might be to escape the next char
 		escape_slash=1
@@ -735,16 +735,19 @@ strict_read(){
 	    if [ "$escape_slash" -eq 1 ]; then
 		escape_slash=0
 		line="$line""$char"
+		char=
 		continue;
 	    elif [ "$escape_slash" -eq 0 ]; then
 		#Handle grouping state - 2 of 2
 		if [ "$entered_group" -eq 1 ]; then
 		    entered_group=0
 		    line="$line""$char"
+		    char=
 		    continue;
 		elif [ "$entered_group" -eq 0 ]; then
 		    entered_group=1
 		    line="$line""$char"
+		    char=
 		    continue;
 		fi		
 	    fi
@@ -760,15 +763,15 @@ strict_read(){
 		    line="$line""$char"
 		    continue;
 		elif [ "$entered_group" -eq 0 ]; then
-		    #record a line
-		    #printf "Line is %s\n" "$line"
+		    #record a line		    
 		    if [ -n "$line" ]; then
+			#printf "Line is %s\n" "$line"
 			strict_array[$index]="$line"
 			char=
 			line=
-			((index+=1))
-			continue;
+			((index+=1))		
 		    fi
+		    continue;
 		fi
 	    elif [ "$entered_comment" -eq 1 ]; then
 		char=
@@ -785,7 +788,7 @@ strict_read(){
     #we add whatever we received if the grouping is complete and we've reached the end of input
     if [ "$entered_group" -eq 0 ]; then
 	if [ -n "$line" ]; then
-	    printf "Line is %s\n" "$line"
+	    #printf "Line is %s\n" "$line"
 	    strict_array[$index]="$line"
 	    char=
 	    line=

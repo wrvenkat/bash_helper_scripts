@@ -4,7 +4,7 @@ main(){
     printf "Running strict_read test!\n"
     source "../strict_read.sh"
     #A working case
-    if strict_read --field='\t,\s' --line="\n" --comment="#" --group='"' < <(cat bnr_list.conf | sort); then
+    if strict_read --field="\t,\s" --line="\n" --comment="#" --group='"' --esc < <(cat bnr_list_1.conf | sort); then
     #Test case for improper escape
     #    if strict_read --field='$,\,@' --line='\n' --comment="#" --group='"' < <(cat bnr_list.conf | sort); then
     #Test case for incorrect start field char
