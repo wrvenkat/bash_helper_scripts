@@ -12,7 +12,7 @@ safe_expand_file_path(){
 	return 0
     fi
 
-    #printf "Received value is %s\n" "$1"
+    printf "Received value is %s\n" "$1"
     local display_tilde_prefix=0
     local safe_file_path=
     local expanded_path=
@@ -38,7 +38,7 @@ safe_expand_file_path(){
     IFS=
     #perform a quoting parse while trying to identify the tilde prefix if present
     while read -r -N 1 char; do
-	printf "Char is %s\n" "$char"
+	#printf "Char is %s\n" "$char"
 	((word_index+=1))
 	#handle s_quote states
 	if [ "$s_quote" -eq 1 ]; then
@@ -165,6 +165,8 @@ safe_expand_file_path(){
 		    if [ "$tilde_spotted" -eq 1 ] && [ "$escaping" -eq 0 ]; then
 			tilde_prefix="$output_string"
 			output_string=
+			tilde_spotted=0
+			#printf "Tilde Prefix is %s\n" "$tilde_prefix"			
 		    #there's no use parsing further, since we're at the end of a tilde-prefix
 		    #if it was present, it should've been by this time and since it isn't, we quit
 		    else
@@ -192,6 +194,10 @@ safe_expand_file_path(){
     if [ "$d_quote" -eq 1 ]; then
 	printf "ERROR: Expecing \":%s\n" "$output_string"
 	exit 1
+    fi
+    if [ "$tilde_spotted" -eq 1 ] && [ -z "$tilde_prefix" ]; then
+	tilde_prefix="$output_string"
+	output_string=
     fi
     #if we've gotten this far with a non-empty tilde-prefix, then
     #we must have a compelling case for a tilde-prefix
