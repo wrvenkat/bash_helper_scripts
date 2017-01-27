@@ -12,7 +12,7 @@ safe_expand_file_path(){
 	return 0
     fi
 
-    printf "Received value is %s\n" "$1"
+    #printf "Received value is %s\n" "$1"
     local display_tilde_prefix=0
     local safe_file_path=
     local expanded_path=
