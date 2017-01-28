@@ -3,7 +3,7 @@
   
 ## Getting started ##
   This section describes each individual script.
-  
+
 ### logger.sh  ###
   A small logging utility that can log error messages and non-error messages. Messages marked for error are prefixed by ERROR: and by default logged to the file error.log and to STDERR. Messages marked as informational are prefixed as INFO: and logged to STDIN. An optional file path can be provided which is used to override the default error.log to log error messages. Messages logged to a file are prefixed with a timestamp.
   * **Arguments**
@@ -47,8 +47,11 @@
 ```
 
 ###  safe_tilde_expansion.sh###
-  This utility tries to perform a *safe*, possilbe tilde expansion of the given string, considering it as a file path and outputs the result. The result is the same as the input if there was no expansion performed. Otherwise, a tilde expanded string is output.
-  Return value? Sourced or invoked?
+  * This utility tries to perform a *safe*, possilbe tilde expansion of the given string, considering it as a file path and outputs the result. The result is the same as the input if there was no expansion performed. Otherwise, a tilde expanded string is output.
+  * This utility is designed to be sourced in to be used and not be invoked. This is because, invoking the script would involve providing the string to be expanded as an argument. This argument unless properly quoted, will result in bash trying to expand which can be dangerous and not desired.
+  * The safe_tilde_expand function, 
+      * returns 0 if a tilde expansion was attempted and the `safe_file_path` contains the expanded file path.
+      * returns 1 if it was deemed that no expansion needed to be done on the input string.
   * **Arguments**
 	  * arg1 - The string to be considered for a tilde expansion.
   * **Example**  
