@@ -19,7 +19,7 @@ bash_quoting_parse(){
     local char=
     local orig_IFS="$IFS"
     input_string="$1"
-    printf "Input string is %s\n" "$input_string"
+    #printf "Input string is %s\n" "$input_string"
 
     IFS=
     while read -r -N 1 char; do
