@@ -169,8 +169,8 @@ safe_expand_file_path(){
 			#printf "Tilde Prefix is %s\n" "$tilde_prefix"			
 		    #there's no use parsing further, since we're at the end of a tilde-prefix
 		    #if it was present, it should've been by this time and since it isn't, we quit
-		    else
-			break
+		    #else
+			#exit 1
 		    fi
 		fi
 		#if any other char, we just record it
@@ -181,7 +181,6 @@ safe_expand_file_path(){
     done < <(printf "%s" "$1")
     #restore the IFS
     IFS="$orig_IFS"
-    #printf "Output_string here is %s\n" "$output_string"
     #At this point if backslash is 1, then it can only be outside of quotes
     #and as the last character
     if [ "$backslash" -eq 1 ]; then
