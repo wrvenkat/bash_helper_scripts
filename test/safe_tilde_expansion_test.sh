@@ -3,12 +3,13 @@
 TEST_FILE1=bnr_list.conf
 TEST_FILE2=bnr_list1.conf
 TEST_FILE3=bnr_list2.conf
+TEST_FILE4=bnr_list3.conf
 
-TEST_FILE="$TEST_FILE2"
+TEST_FILE="$TEST_FILE4"
 
 main(){
     printf "Running strict_read test!\n"
-    source "../strict_read.sh"    
+    source "../strict_read.sh"
     #A working case
     if strict_read --field='\t,\s' --line="\n" --comment="#" --group='"' --esc < <(cat "$TEST_FILE" | sort); then
 	while strict_get; do
