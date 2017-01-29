@@ -302,12 +302,8 @@ get_field_char_array(){
 	if [ "$char" == ',' ]; then
 	    #Handle comma state - 1 of 2
 	    if [ "$escape_slash" -eq 1 ]; then
-		escape_slash=0
-		recorded_char="$recorded_char""$char"
-		if get_ascii_char "$recorded_char"; then
-		    recorded_char="$actual_ascii_value12char"
-		fi
-		field_char_array[$index]="$recorded_char"
+		escape_slash=0		
+		field_char_array[$index]=','
 		((index+=1))
 		recorded_char_count=1
 		recorded_char=
@@ -376,23 +372,17 @@ get_field_char_array(){
 	    fi
 	fi	
     done < <(printf "%s" "$1")
-    #if there seems to be more to be read, but none specified
-    if [ "$saw_comma" -eq 1 ]; then
-	printf "%s\n" "$error_msg"
-	return 1
-    fi
     IFS="$orig_IFS"
 
-    index=0
-    char=
-    while [ $index -lt ${#field_char_array[*]} ]; do	
-	char="${field_char_array[$index]}"
-	#printf "char is %s\n" "$char"
-	if [ "$char" == '\' ]; then
+    local entry=
+    local index=0
+    for index in "${!field_char_array[@]}"; do
+	entry="${field_char_array[index]}"
+	#printf "Entry is %s\n" "$entry"
+	if [ "$entry" == '\' ]; then
 	    print_no_slash_message
 	    return 1
 	fi
-	((index+=1))
     done
     return 0
 }
