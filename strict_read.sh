@@ -901,7 +901,7 @@ strict_get(){
 		continue
 	    else
 		if [ "$PRESERVE_ESCAPE_CHAR" -eq 1 ]; then
-		    word="$word"'"'
+		    word="$word""$char"
 		fi
 		entered_group=1
 		continue
