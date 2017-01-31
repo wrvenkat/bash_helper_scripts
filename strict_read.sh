@@ -740,11 +740,13 @@ strict_read(){
 	    elif [ "$escape_slash" -eq 0 ]; then
 		#Handle grouping state - 2 of 2
 		if [ "$entered_group" -eq 1 ]; then
+		    #printf "Leaving group\n"
 		    entered_group=0
 		    line="$line""$char"
 		    char=
 		    continue;
 		elif [ "$entered_group" -eq 0 ]; then
+		    #printf "Entering group\n"
 		    entered_group=1
 		    line="$line""$char"
 		    char=
@@ -911,7 +913,7 @@ strict_get(){
 		continue
 	    else
 		if [ "$PRESERVE_ESCAPE_CHAR" -eq 1 ]; then
-		    word="$word"'"'
+		    word="$word""$char"
 		fi
 		entered_group=1
 		continue
