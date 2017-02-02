@@ -28,16 +28,9 @@ log_msg(){
 	LOG_SOURCE_FLG=1
 	return 0
     fi
-
-    printf "\$@ is %s:\n" "$@"
-    if [ "$LOG_SOURCE_FLG" -eq 1 ]; then
-	return 1
-    else
-	exit 1
-    fi
+    
     #parse args
-    local args="$@"
-    if [ -z "$args" ]; then
+    if [ -z "$*" ]; then
 	printf "No arguments received. Use -h or --help to see usage.\n"
 	if [ "$LOG_SOURCE_FLG" -eq 1 ]; then
 	    return 0
@@ -46,47 +39,12 @@ log_msg(){
 	fi
     fi
     
-    local parsed_args=$(getopt -o h,c,t,e,n,l:,m:: -l help,nocolour,notime,err,nolog,line:,logfile::,msg:: -n 'logger' -- "$@" 2>&1)
+    local parsed_args="$(getopt -o h,c,t,e,n,l:,m:: -l help,nocolour,notime,err,nolog,line:,logfile::,msg:: -n 'logger' -- "$@" 2>&1)"
+    local retVal=$?
 
-    #an ugly way of finding if the parsing of the arguments went through successfully
-    local line_count=$(echo "$parsed_args" | wc -l)
-    local index=1
-    #if we have more than 1 line then one must be the failure
-    if [ $line_count -gt 1 ] || [ -z "$parsed_args" ]; then
-	if [ $line_count -gt 1 ]; then
-	    while read line; do
-		if [ $index -eq 1 ]; then
-		    printf "%s\n" "$line"
-		    ((index+=1))
-		    break
-		fi
-	    done < <(echo "$parsed_args")
-	else
-	    printf "Invalid arguments received. Use -h or --help to see usage.\n"
-	fi
-	if [ "$LOG_SOURCE_FLG" -eq 1 ]; then
-	    return 0
-	else
-	    exit 0
-	fi
-    fi
-    
-    #remove leading space(s).
-    #printf "Parsed args1 is: %s\n" "$parsed_args"
-    local new_args=
-    local index=1
-    for i in $parsed_args; do		
-	if [ $index -eq 1 ]; then
-	    new_args=$i
-	    ((index+=1))
-	else
-	    new_args+=" $i"
-	fi
-    done
-
-    new_args="$(tr -d '\n' < <(echo "$new_args"))"
-    parsed_args="$new_args"
-    printf "Parsed args2 is: %s\n" "$parsed_args"
+    #remove any new-line chars
+    parsed_args="$(tr -d '\n' < <(echo "$parsed_args"))"
+    #printf "Parsed args2 is: %s\n" "$parsed_args"
     eval set -- $parsed_args
 
     local type_arg=
