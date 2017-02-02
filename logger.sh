@@ -29,6 +29,12 @@ log_msg(){
 	return 0
     fi
 
+    printf "\$@ is %s:\n" "$@"
+    if [ "$LOG_SOURCE_FLG" -eq 1 ]; then
+	return 1
+    else
+	exit 1
+    fi
     #parse args
     local args="$@"
     if [ -z "$args" ]; then
@@ -78,8 +84,9 @@ log_msg(){
 	fi
     done
 
+    new_args="$(tr -d '\n' < <(echo "$new_args"))"
     parsed_args="$new_args"
-    #printf "Parsed args2 is: %s\n" "$parsed_args"
+    printf "Parsed args2 is: %s\n" "$parsed_args"
     eval set -- $parsed_args
 
     local type_arg=
