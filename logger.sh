@@ -12,7 +12,18 @@ LOG_FIRST_RUN=0
 
 #help message
 display_help_msg(){
-    printf "Halp!\n"
+    printf "usage: logger.sh [options] [-m=<message>|--msg=<message>]\n"
+    printf "\nA small sourceable or invokeable shell script to generate customizable\n"
+    printf "INFO and ERROR log messages to the console and to a file.\n"
+    printf "\nOptions:\n"
+    printf "   -h | --help - display this help message and exit.\n"
+    printf "   -c | --nocolour - do not colour the log prefix.\n"
+    printf "   -t | --notime - no time stamp in the log prefix.\n"
+    printf "   -e | --err - the current message is an error. All messages are not error by default.\n"
+    printf "   -n | --nolog - do not log the message to the log file. All messages are logged by default.\n"
+    printf "   -l=<path> | --logfile=<path> - use the provided file path as the log file. By default, the file is error.log\n"
+    printf "   -m=[message] | --msg=[message] - the optional message information to be logged. An empty message causes a new line to be output.\n"
+    printf "\nNOTE: When sourced, the script logs a series of '*' before the first message is logged.\n"
 }
 
 log_msg(){
@@ -42,7 +53,7 @@ log_msg(){
     local parsed_args="$(getopt -o h,c,t,e,n,l:,m:: -l help,nocolour,notime,err,nolog,line:,logfile::,msg:: -n 'logger' -- "$@" 2>&1)"
     local retVal=$?
 
-    #remove any new-line chars
+    #remove any new-line chars even if the message would be fine because it can cause "log forging"
     parsed_args="$(tr -d '\n' < <(echo "$parsed_args"))"
     #printf "Parsed args2 is: %s\n" "$parsed_args"
     eval set -- $parsed_args
