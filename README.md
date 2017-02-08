@@ -5,7 +5,7 @@
   This section describes each individual script.
 
 ### logger.sh  ###
-  A small logging utility that can log error messages and non-error messages. Messages marked for error are prefixed by ERROR: and by default logged to the file error.log and to STDERR. Messages marked as informational are prefixed as INFO: and logged to STDIN. An optional file path can be provided which is used to override the default error.log to log error messages. All messages are prefixed with a timestamp.
+  A small logging utility that can log error messages and non-error messages. Messages marked for error are prefixed by ERROR: and by default logged to the file error.log and to STDERR. Messages marked as informational are prefixed as INFO: and logged to STDIN. An optional file path can be provided which is used to override the default error.log to log error messages. All messages are prefixed with a timestamp. 
   The script can be either sourced or invoked. When sourced, the script outputs a series of * before the first message for that runtime session is logged to the file.
   * **Usage**
 ``` bash
