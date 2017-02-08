@@ -9,16 +9,16 @@
   The script can be either sourced or invoked. When sourced, the script outputs a series of * before the first message for that runtime session is logged to the file.
   * **Usage**
 ``` bash
-	logger.sh | log_msg [options] [-m=<message>|--msg=<message>]
+logger.sh | log_msg [options] [-m=<message>|--msg=<message>]
 	
-	Options:
-       -h | --help - display this help message and exit.
-       -c | --nocolour - do not colour the log prefix.
-       -t | --notime - no time stamp in the log prefix.
-       -e | --err - the current message is an error. All messages are not error by default.
-       -n | --nolog - do not log the message to the log file. All messages are logged by default.
-       -l=<path> | --logfile=<path> - use the provided file path as the log file. By default, the file is error.log
-       -m=[message] | --msg=[message] - the optional message information to be logged. An empty message causes a new line to be output.
+Options:
+ -h | --help - display this help message and exit.
+ -c | --nocolour - do not colour the log prefix.
+ -t | --notime - no time stamp in the log prefix.
+ -e | --err - the current message is an error. All messages are not error by default.
+ -n | --nolog - do not log the message to the log file. All messages are logged by default.
+ -l=<path> | --logfile=<path> - use the provided file path as the log file. By default, the file is error.log
+ -m=[message] | --msg=[message] - the optional message information to be logged. An empty message causes a new line to be output.
 ```
 	  
 ### strict_read.sh ###
