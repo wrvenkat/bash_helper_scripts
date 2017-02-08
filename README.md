@@ -5,11 +5,21 @@
   This section describes each individual script.
 
 ### logger.sh  ###
-  A small logging utility that can log error messages and non-error messages. Messages marked for error are prefixed by ERROR: and by default logged to the file error.log and to STDERR. Messages marked as informational are prefixed as INFO: and logged to STDIN. An optional file path can be provided which is used to override the default error.log to log error messages. Messages logged to a file are prefixed with a timestamp.
-  * **Arguments**
-	  * arg1 - the level. 0 - for informational and 1 - for error.
-	  * arg2 - the message.
-	  * arg3 - optional line no.
+  A small logging utility that can log error messages and non-error messages. Messages marked for error are prefixed by ERROR: and by default logged to the file error.log and to STDERR. Messages marked as informational are prefixed as INFO: and logged to STDIN. An optional file path can be provided which is used to override the default error.log to log error messages. All messages are prefixed with a timestamp.
+  The script can be either sourced or invoked. When sourced, the script outputs a series of * before the first message for that runtime session is logged to the file.
+  * **Usage**
+``` bash
+	logger.sh | log_msg [options] [-m=<message>|--msg=<message>]
+	
+	Options:
+       -h | --help - display this help message and exit.
+       -c | --nocolour - do not colour the log prefix.
+       -t | --notime - no time stamp in the log prefix.
+       -e | --err - the current message is an error. All messages are not error by default.
+       -n | --nolog - do not log the message to the log file. All messages are logged by default.
+       -l=<path> | --logfile=<path> - use the provided file path as the log file. By default, the file is error.log
+       -m=[message] | --msg=[message] - the optional message information to be logged. An empty message causes a new line to be output.
+```
 	  
 ### strict_read.sh ###
   This utility script provides bash's `read` type functionality. This utlity reads a file and splits it into *lines*, ignoring *comments*. Within a line, the utlity combines text based on *fields* and *groups*. Each of the distinguishing types are individually configurable as follows,
