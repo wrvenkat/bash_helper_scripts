@@ -5,7 +5,7 @@ LOG_FIRST_RUN=0
 
 #help message
 display_help_msg(){
-    printf "usage: logger.sh [options] [-m=<message>|--msg=<message>]\n"
+    printf "usage: <log_msg | logger.sh> [options] [-m=<message>|--msg=<message>]\n"
     printf "\nA small sourceable or invokeable shell script to generate customizable\n"
     printf "INFO and ERROR log messages to the console and to a file.\n"
     printf "\nOptions:\n"
