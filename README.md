@@ -76,7 +76,7 @@ Options:
 	  `./safe_tilde_expansion '~'\$\(eval\ \"test\\\'\``\(\)\;@%\)/` outputs, `~$(eval "test\'\'();@%)`  
 
 ### bash_quoting_parsing.sh  ###
-  A small logging utility that performs bash's [quoting](https://www.gnu.org/software/bash/manual/bash.html#Quoting) (the first 3 bullets) parsing. There is no expansion of values like $ inside double quotes.
+  A small utility script that performs bash's [quoting](https://www.gnu.org/software/bash/manual/bash.html#Quoting) (the first 3 bullets) parsing. There is no expansion of values like $ inside double quotes.
   * This script is intended to be sourced and not invoked.
   * Accepts the string as an argument to the function `bash_quoting_parse`.
   * If successful, returns 0 with the parsed string in the variable `quoting_parsed_string`.
