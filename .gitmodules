@@ -1,4 +1,0 @@
-[submodule "test"]
-	path = test
-	url = https://github.com/wrvenkat/bash_helper_scripts.git
-	branch = test
